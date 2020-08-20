@@ -1,2 +1,5 @@
 # brtcalc
-Bible read-through calendar generator
+A simple Bible read-through calendar generator
+
+## Requires
+python
