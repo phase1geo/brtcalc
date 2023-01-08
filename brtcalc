@@ -92,14 +92,14 @@ uniquifier    = 0
 # Outputs usage information and exits
 #################################################################
 def usage():
-  print "Usage:  brtcalc [--start-date <start_date>] [--start-chapter <book>:<chapter>] [--cpd [<book>=]<chapters_per_day>]"
-  print "  --start-date <start_date>          Specifies the date to start the read-through planner"
-  print "  --start-chapter <book>:<chapter>   Specifies the book and chapter to start the read-through planner (default is Genesis:1)"
-  print "  --cpd [<book>=]<chapters_per_day>  Specifies the number of chapters to read per day (default is 2).  If <book>=<chapters_per_day>"
-  print "                                     is specified, the planner will schedule for the provided chapter number when reading the"
-  print "                                     given book.  For example, if --cpd Psalms=5 is specified, the planner will schedule for"
-  print "                                     2 chapters to be read in every book but when Psalms are read, 5 chapters will be scheduled."
-  print "                                     More than one --cpd option may be specified.  They are used in the order given."
+  print( "Usage:  brtcalc [--start-date <start_date>] [--start-chapter <book>:<chapter>] [--cpd [<book>=]<chapters_per_day>]" )
+  print( "  --start-date <start_date>          Specifies the date to start the read-through planner" )
+  print( "  --start-chapter <book>:<chapter>   Specifies the book and chapter to start the read-through planner (default is Genesis:1)" )
+  print( "  --cpd [<book>=]<chapters_per_day>  Specifies the number of chapters to read per day (default is 2).  If <book>=<chapters_per_day>" )
+  print( "                                     is specified, the planner will schedule for the provided chapter number when reading the" )
+  print( "                                     given book.  For example, if --cpd Psalms=5 is specified, the planner will schedule for" )
+  print( "                                     2 chapters to be read in every book but when Psalms are read, 5 chapters will be scheduled." )
+  print( "                                     More than one --cpd option may be specified.  They are used in the order given." )
   quit()
 
 #################################################################
@@ -124,38 +124,38 @@ def parse_args(args):
       if i == len(args):
         usage()
       user_date  = args[i].split('/')
-      start_date = datetime.date( string.atoi(user_date[2]), string.atoi(user_date[0]), string.atoi(user_date[1]) )
+      start_date = datetime.date( int(user_date[2]), int(user_date[0]), int(user_date[1]) )
     elif arg == '--start-chapter':
       i = i + 1
       if i == len(args):
         usage()
       start         = args[i].split(':')
-      start_chapter = string.atoi(start[1]) - 1
-      print "start_chapter %d" % start_chapter
+      start_chapter = int(start[1]) - 1
+      print( "start_chapter %d" % start_chapter )
       start_book    = lookup_book( start[0] )
       if start_book == len(books):
-        raise ValueError, 'Specified --start-chapter book reference is not a valid book name'
+        raise ValueError( 'Specified --start-chapter book reference is not a valid book name' )
       if (start_chapter < 0) or (start_chapter >= books[start_book][1]):
-        raise ValueError, 'Specified --start-chapter chapter that is not valid for the given book'
+        raise ValueError( 'Specified --start-chapter chapter that is not valid for the given book' )
     elif arg == '--cpd':
       i = i + 1
       if i == len(args):
         usage()
       cpd = args[i].split('=')
       if len(cpd) > 2:
-        raise ValueError, "Specified --cpd contained more than one '=' sign"
+        raise ValueError( "Specified --cpd contained more than one '=' sign" )
       elif len(cpd) == 2:
         book     = lookup_book( cpd[0] )
-        chapters = string.atoi( cpd[1] )
+        chapters = int( cpd[1] )
         if book == len(books):
-          raise ValueError, 'Specified --cpd book reference is not a valid book name'
+          raise ValueError( 'Specified --cpd book reference is not a valid book name' )
         if chapters <= 0:
-          raise ValueError, 'Specified --cpd with zero or fewer chapters per day value'
+          raise ValueError( 'Specified --cpd with zero or fewer chapters per day value' )
         books[book][2] = chapters
       else:
-        chapters = string.atoi( args[i] )
+        chapters = int( args[i] )
         if chapters <= 0:
-          raise ValueError, 'Specified --cpd with zero or fewer chapters per day value'
+          raise ValueError( 'Specified --cpd with zero or fewer chapters per day value' )
         for book in books:
           book[2] = chapters
     else:
@@ -210,7 +210,7 @@ def get_nth_book_chapter(curr_book, curr_chapter, adv_one = 0):
 #################################################################
 def generate_ical():
   global start_book, start_chapter
-  print "Generating brt_cal.ics ...  ",
+  print( "Generating brt_cal.ics ...  ", )
   cal = icalendar.Calendar()
   cal.add('prodid', '-//BRT calendar//mxm.dk//')
   cal.add('version', '2.0')
@@ -224,10 +224,10 @@ def generate_ical():
     end_book,   end_chapter,   num = get_nth_book_chapter( start_book, start_chapter )
     curr_day = output_day( cal, curr_day, timestamp, books[start_book][0], (start_chapter + 1), books[end_book][0], (end_chapter + 1) )
     start_book, start_chapter, num = get_nth_book_chapter( end_book, end_chapter, 1 )
-  output = open( 'brt_cal.ics', 'w' )
+  output = open( 'brt_cal.ics', 'wb' )
   output.write( cal.to_ical() )
   output.close()
-  print "Done!"
+  print( "Done!" )
 
 if __name__ == "__main__":
   parse_args( sys.argv[1:] )
